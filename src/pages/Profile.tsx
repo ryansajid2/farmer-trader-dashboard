@@ -166,7 +166,7 @@ const Profile = () => {
 
             <div className="flex justify-end">
               <Button onClick={handleSubmit}>
-                Save Changes
+                Submit
               </Button>
             </div>
           </form>
