@@ -16,6 +16,7 @@ type Profile = Database['public']['Tables']['profiles']['Row'];
 const Profile = () => {
   const { toast } = useToast();
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [formData, setFormData] = useState<Partial<Profile>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,6 +36,7 @@ const Profile = () => {
 
       if (error) throw error;
       setProfile(data);
+      setFormData(data);
     } catch (error) {
       console.error('Error loading profile:', error);
       toast({
@@ -47,19 +49,23 @@ const Profile = () => {
     }
   };
 
-  const updateProfile = async (updates: Partial<Profile>) => {
+  const handleInputChange = (key: keyof Profile, value: string) => {
+    setFormData(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleSubmit = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
       const { error } = await supabase
         .from('profiles')
-        .update(updates)
+        .update(formData)
         .eq('id', user.id);
 
       if (error) throw error;
 
-      setProfile(prev => prev ? { ...prev, ...updates } : null);
+      setProfile(prev => prev ? { ...prev, ...formData } : null);
       toast({
         title: "Profile updated",
         description: "Your profile has been updated successfully.",
@@ -109,16 +115,16 @@ const Profile = () => {
                 <Label>Full Name</Label>
                 <Input 
                   placeholder="Enter your name" 
-                  value={profile?.full_name || ''} 
-                  onChange={(e) => updateProfile({ full_name: e.target.value })}
+                  value={formData?.full_name || ''} 
+                  onChange={(e) => handleInputChange('full_name', e.target.value)}
                 />
               </div>
               
               <div className="space-y-2">
                 <Label>Role</Label>
                 <Select 
-                  value={profile?.role} 
-                  onValueChange={(value) => updateProfile({ role: value as 'farmer' | 'retailer' })}
+                  value={formData?.role} 
+                  onValueChange={(value) => handleInputChange('role', value as 'farmer' | 'retailer')}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select your role" />
@@ -134,8 +140,8 @@ const Profile = () => {
                 <Label>Contact</Label>
                 <Input 
                   placeholder="Enter your contact" 
-                  value={profile?.contact || ''} 
-                  onChange={(e) => updateProfile({ contact: e.target.value })}
+                  value={formData?.contact || ''} 
+                  onChange={(e) => handleInputChange('contact', e.target.value)}
                 />
               </div>
               
@@ -143,8 +149,8 @@ const Profile = () => {
                 <Label>Location</Label>
                 <Input 
                   placeholder="Enter your location" 
-                  value={profile?.location || ''} 
-                  onChange={(e) => updateProfile({ location: e.target.value })}
+                  value={formData?.location || ''} 
+                  onChange={(e) => handleInputChange('location', e.target.value)}
                 />
               </div>
             </div>
@@ -153,9 +159,15 @@ const Profile = () => {
               <Label>About</Label>
               <Textarea
                 placeholder="Tell us about yourself"
-                value={profile?.about || ''}
-                onChange={(e) => updateProfile({ about: e.target.value })}
+                value={formData?.about || ''}
+                onChange={(e) => handleInputChange('about', e.target.value)}
               />
+            </div>
+
+            <div className="flex justify-end">
+              <Button onClick={handleSubmit}>
+                Save Changes
+              </Button>
             </div>
           </form>
         </Card>
