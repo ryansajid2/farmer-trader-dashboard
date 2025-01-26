@@ -101,9 +101,9 @@ const Profile = () => {
               </Button>
             </div>
             <h2 className="text-xl font-semibold">{profile?.full_name || 'Anonymous'}</h2>
-            <p className="text-sm text-muted-foreground capitalize">{profile?.role || 'No role set'}</p>
+            <p className="text-sm text-muted-foreground capitalize">{profile?.role}</p>
             <div className="w-full px-4 py-2 bg-muted rounded-md text-sm">
-              <p className="text-center break-all">ID: {profile?.id}</p>
+              <p className="text-center break-all">User ID: {profile?.id}</p>
             </div>
           </div>
         </Card>
@@ -117,6 +117,15 @@ const Profile = () => {
                   placeholder="Enter your name" 
                   value={formData?.full_name || ''} 
                   onChange={(e) => handleInputChange('full_name', e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>User ID</Label>
+                <Input 
+                  value={profile?.id || ''} 
+                  readOnly
+                  className="bg-muted"
                 />
               </div>
               
